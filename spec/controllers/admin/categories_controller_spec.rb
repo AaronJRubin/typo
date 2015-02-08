@@ -17,6 +17,9 @@ describe Admin::CategoriesController do
   end
 
   describe "test_new" do
+    before(:each) do
+      get :new
+    end
     it 'should render template new' do
       assert_template 'new'
     end
