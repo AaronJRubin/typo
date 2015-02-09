@@ -41,9 +41,15 @@ Given /^the blog is set up$/ do
                 :profile_id => 1,
                 :name => 'admin',
                 :state => 'active'})
+  User.create!({:login => 'notadmin',
+                :password => 'aaaaaaaa',
+                :email => 'bran@stark.com',
+                :profile_id => 2,
+                :name => 'notadmin',
+                :state => 'active'})
 end
 
-And /^I am logged into the admin panel$/ do
+Given /^I am logged into the admin panel$/ do
   visit '/accounts/login'
   fill_in 'user_login', :with => 'admin'
   fill_in 'user_password', :with => 'aaaaaaaa'
@@ -52,6 +58,32 @@ And /^I am logged into the admin panel$/ do
     page.should have_content('Login successful')
   else
     assert page.has_content?('Login successful')
+  end
+end
+
+Given /^I am logged in as notadmin$/ do
+  visit '/accounts/login'
+  fill_in 'user_login', :with => 'notadmin'
+  fill_in 'user_password', :with => 'aaaaaaaa'
+  click_button 'Login'
+  if page.respond_to? :should
+    page.should have_content('Login successful')
+  else
+    assert page.has_content?('Login successful')
+  end
+end
+
+Given /^the following articles exist/ do |articles_table|
+  articles_table.hashes.each do |article|
+    article[:user] = User.find_by_name(article[:user])
+    Article.new(article).save()
+  end
+end
+
+Given /^the following comments exist/ do |comments_table|
+  comments_table.hashes.each do |comment|
+    comment[:article] = Article.find_by_title(comment[:article])
+    Comment.new(comment).save()
   end
 end
 
@@ -64,6 +96,10 @@ end
 When /^(.*) within (.*[^:]):$/ do |step, parent, table_or_string|
   with_scope(parent) { When "#{step}:", table_or_string }
 end
+
+#Given /^(?:|I ) am on the edit page for (.+)$/ do |article_title|
+#  visit "/admin/content/edit/#{Article.find_by_title(article_title).id}"
+#end
 
 Given /^(?:|I )am on (.+)$/ do |page_name|
   visit path_to(page_name)
