@@ -36,13 +36,14 @@ class Admin::ContentController < Admin::BaseController
       return
     end
 #puts "Trying to edit with #{current_user}"
-#   puts "current_user.admin?=#{current_user.admin?}"
+#    puts "current_user.admin?=#{current_user.admin?}"
     if current_user.admin?
       @can_merge = true
       if request.post? && params[:merge_with]
 #puts "A merge_with post has been received!"
         second_article = Article.find(params[:merge_with])
         if second_article
+#         puts "Second article found!"
           @article.merge(second_article)
           second_article.delete
           redirect_to :action => 'index'
