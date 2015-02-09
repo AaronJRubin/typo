@@ -598,6 +598,34 @@ describe Article do
     end
   end
 
+  describe "#merge" do
+    before(:each) do
+      joe = User.create(:name => "joe")
+      steve = User.create(:name => "steve")
+      @article1 = Article.create(:body => "I went to Bob's party", :title => "Fun with Bob", :user => joe)
+      article2 = Article.create(:body => "I, too, went to Bob's party", :title => "Adventures at Bob's", :user => steve)
+      @comment1 = Comment.create(:body => "I hate you, Joe", :article => @article1, :author => "jessica")
+      @comment2 = Comment.create(:body => "I hate you, Steve", :article => article2, :author => "sarah")
+      @article1.merge(article2)
+      article2.delete
+    end
+    it "should have text from both articles" do
+      @article1.body.should =~ /.*I, too, went to Bob's party.*/
+      @article1.body.should =~ /.*I went to Bob's party.*/
+    end
+    it "should have the author of the article from which it was called" do
+      @article1.user.name.should == "joe"
+    end
+    it "should have the title of the article from which it was called" do
+      @article1.title.should == "Fun with Bob"
+    end
+    it "should have the comments from both articles" do
+      @article1.comments.length.should == 2
+      @article1.comments.should include(@comment1)
+      @article1.comments.should include(@comment2)
+    end
+  end
+
   describe "#get_or_build" do
     context "when no params given" do
       before(:each) do

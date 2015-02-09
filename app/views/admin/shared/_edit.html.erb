@@ -4,3 +4,11 @@
   <%= render :partial => "form" %>
 
 <% end %>
+
+<% if @can_merge %>
+<h2>Merge Articles</h2>
+<form id="merge" method="post">
+<label for="merge_width">Article ID:</label> <input name="merge_with" />
+<input type="submit" value="Merge" />
+</form>
+<% end %>

@@ -15,7 +15,8 @@ class Admin::ContentController < Admin::BaseController
     @search = params[:search] ? params[:search] : {}
     
     @articles = Article.search_with_pagination(@search, {:page => params[:page], :per_page => this_blog.admin_display_elements})
-
+#puts "Rendering index!"
+#    puts "Articles fetched = #{@articles}"
     if request.xhr?
       render :partial => 'article_list', :locals => { :articles => @articles }
     else
@@ -33,6 +34,25 @@ class Admin::ContentController < Admin::BaseController
       redirect_to :action => 'index'
       flash[:error] = _("Error, you are not allowed to perform this action")
       return
+    end
+#puts "Trying to edit with #{current_user}"
+#   puts "current_user.admin?=#{current_user.admin?}"
+    if current_user.admin?
+      @can_merge = true
+      if request.post? && params[:merge_with]
+#puts "A merge_with post has been received!"
+        second_article = Article.find(params[:merge_with])
+        if second_article
+          @article.merge(second_article)
+          second_article.delete
+          redirect_to :action => 'index'
+          return
+        else
+          flash[:error] = _("Error, the merge target does not exist")
+          redirect_to :action => 'index'
+          return
+        end
+      end
     end
     new_or_edit
   end

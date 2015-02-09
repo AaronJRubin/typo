@@ -35,12 +35,13 @@ Given /^the blog is set up$/ do
   Blog.default.update_attributes!({:blog_name => 'Teh Blag',
                                    :base_url => 'http://localhost:3000'});
   Blog.default.save!
-  User.create!({:login => 'admin',
+  admin = User.create!({:login => 'admin',
                 :password => 'aaaaaaaa',
                 :email => 'joe@snow.com',
                 :profile_id => 1,
                 :name => 'admin',
                 :state => 'active'})
+#admin.profile.label == Profile::Admin
   User.create!({:login => 'notadmin',
                 :password => 'aaaaaaaa',
                 :email => 'bran@stark.com',
@@ -76,6 +77,7 @@ end
 Given /^the following articles exist/ do |articles_table|
   articles_table.hashes.each do |article|
     article[:user] = User.find_by_name(article[:user])
+    article[:published] = true
     Article.new(article).save()
   end
 end
@@ -115,6 +117,10 @@ end
 
 When /^(?:|I )follow "([^"]*)"$/ do |link|
   click_link(link)
+end
+
+When /^(?:|I )type the id of article "([^"]+)" into "([^"]+)"/ do |article, field|
+  fill_in(field, :with => Article.find_by_title(article).id)
 end
 
 When /^(?:|I )fill in "([^"]*)" with "([^"]*)"$/ do |field, value|

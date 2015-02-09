@@ -416,6 +416,28 @@ class Article < Content
     user.admin? || user_id == user.id
   end
 
+  def merge(other)
+#puts "Calling merge!"
+#   puts "My body is " + body
+#   puts "The other's body is " + other.body
+#   puts "The sum of those bodies is " + (body + other.body)
+#params = to_param
+#   puts params
+#puts "original user #{user.name}"
+#   new_article = Article.create(self.attributes)
+#   puts "copied user #{new_article.user.name}"
+#   new_article.body = body + "\n" + other.body
+#   new_article.comments = comments + other.comments
+#   new_article.save
+    self.comments << other.comments
+    self.body = body + "\n " + other.body
+    self.save()
+    return self
+#params[:body] = body + other.body
+#   params[:comments] = 
+#    self.body = body + other.body
+  end
+
   protected
 
   def set_published_at
@@ -466,4 +488,6 @@ class Article < Content
     to = to - 1 # pull off 1 second so we don't overlap onto the next day
     return from..to
   end
+
+  
 end
